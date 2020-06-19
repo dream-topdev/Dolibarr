@@ -96,19 +96,25 @@ class ActionsMyApprovalFlow
     {
         global $conf, $user, $langs;
 
-        var_dump($this);
-        echo "<script> alert(0);</script>";
+        //var_dump($this);
+        //echo "<script> alert(0);</script>";
         dol_syslog("testdoaction", LOG_DEBUG);
+		print_r($_SERVER);
+		//exit;
         $error = 0; // Error counter
-        print_r($parameters);
-        echo "action: " . $action;
-        exit(1);
-        print_r($object);
+        //print_r($parameters);
+        //echo "action: " . $action;
+        //print_r($object);
         /* print_r($parameters); print_r($object); echo "action: " . $action; */
-        if (in_array($parameters['currentcontext'], array('somecontext1','somecontext2')))	    // do something only for the context 'somecontext1' or 'somecontext2'
+        if (in_array($parameters['currentcontext'], array('globalcard','somecontext2')))	    // do something only for the context 'somecontext1' or 'somecontext2'
         {
             // Do what you want here...
             // You can for example call global vars like $fieldstosearchall to overwrite them, or update database depending on $action and $_POST values.
+            //echo "<script> alert(0);</script>";
+            //print_r($action);
+            //print_r($_POST);
+			//exit(1);
+            dol_syslog("postaction", LOG_DEBUG);
         }
 
         if (! $error) {
