@@ -153,9 +153,9 @@ class ActionsMyApprovalFlow
 	    $context = explode(':', $parameters['context']);
 		if (in_array('ordersuppliercard', $context)) {		
 			if ($object->statut == Facture::STATUS_VALIDATED) {
-				print '<a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=reopen">'.$langs->trans("Ok, Approve").'</a>';
+				print '<a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=approve">'.$langs->trans("Ok, Approve").'</a>';
 				print '<a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=reopen">'.$langs->trans("No, Disapprove").'</a>';
-				return 1;
+				return 0;
 			}
 		}
 		return 0;	    
