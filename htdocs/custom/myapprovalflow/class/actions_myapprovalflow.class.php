@@ -102,19 +102,37 @@ class ActionsMyApprovalFlow
 		//print_r($_SERVER);
 		//exit;
         $error = 0; // Error counter
-        //print_r($parameters);
-        //echo "action: " . $action;
-        //print_r($object);
+        var_dump($parameters);
+		echo "======================<br>";
+        echo "action: " . $action;
+		echo "======================<br>";
         /* print_r($parameters); print_r($object); echo "action: " . $action; */
-        if (in_array($parameters['currentcontext'], array('globalcard','somecontext2')))	    // do something only for the context 'somecontext1' or 'somecontext2'
-        {
+        $context = explode(':', $parameters['context']);
+		if (in_array('ordersuppliercard', $context) && $action == "valid") {
             // Do what you want here...
             // You can for example call global vars like $fieldstosearchall to overwrite them, or update database depending on $action and $_POST values.
-            //echo "<script> alert(0);</script>";
-            //print_r($action);
-            //print_r($_POST);
-			//exit(1);
-            dol_syslog("postaction", LOG_DEBUG);
+			foreach( $object->lines as $line){				
+				//var_dump($line->product_ref);
+			}
+			
+			/**
+			* get user list example
+			*/
+			require_once DOL_DOCUMENT_ROOT .'/user/class/user.class.php';
+			$usergroup = new User($this->db);
+			$usergroup->fetchAll('ASC','t.rowid',  100, 0, array("customsql" => "t.login like 'mustafa'"));
+			//var_dump($usergroup->users);
+			//echo "<br><br><br>";
+			/**
+			* send mail example
+			*/
+			include_once DOL_DOCUMENT_ROOT.'/core/class/CMailFile.class.php';
+			$mail = new CMailFile('test', 'postmaster@localhost', 'test@localhost', 'hello', array(), array(), array(), '', '', 0, '', '', '', '', '', 'standard');
+
+			//$result = $mail->check_server_port('localhost', 25);
+			//var_dump($result);
+			//var_dump($mail->sendfile());
+			dol_syslog("postaction", LOG_DEBUG);
         }
 
         if (! $error) {
