@@ -61,8 +61,8 @@ class modMyApprovalFlow extends DolibarrModules
         $this->description = "MyApprovalFlowDescription";
         // Used only if file README.md and README-LL.md not found.
         $this->descriptionlong = "MyApprovalFlow description (Long)";
-        $this->editor_name = 'Editor name';
-        $this->editor_url = 'https://www.example.com';
+        $this->editor_name = 'Mustafa';
+        $this->editor_url = 'mailto:mbattaloglufl@gmail.com';
         // Possible values for version are: 'development', 'experimental', 'dolibarr', 'dolibarr_deprecated' or a version string like 'x.y.z'
         $this->version = '1.0';
         // Url to the file with your last numberversion of this module
@@ -94,7 +94,7 @@ class modMyApprovalFlow extends DolibarrModules
             'theme' => 0,
             // Set this to relative path of css file if module has its own css file
             'css' => array(
-                //    '/myapprovalflow/css/myapprovalflow.css.php',
+                    '/myapprovalflow/css/myapprovalflow.css.php',
             ),
             // Set this to relative path of js file if module must load a js on all pages
             'js' => array(

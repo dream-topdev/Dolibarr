@@ -99,7 +99,7 @@ class ActionsMyApprovalFlow
         //var_dump($this);
         //echo "<script> alert(0);</script>";
         dol_syslog("testdoaction", LOG_DEBUG);
-		print_r($_SERVER);
+		//print_r($_SERVER);
 		//exit;
         $error = 0; // Error counter
         //print_r($parameters);
@@ -126,6 +126,40 @@ class ActionsMyApprovalFlow
             return -1;
         }
     }
+	/**
+     * Overloading the formObjectOptions function : replacing the parent's function with the one below
+     *
+     * @param   array() $parameters Hook metadatas (context, etc...)
+     * @param   CommonObject &$object The object to process (an invoice if you are in invoice module, a propale in propale's module, etc...)
+     * @param   string &$action Current action (if set). Generally create or edit or null
+     * @param   HookManager $hookmanager Hook manager propagated to allow calling another hook
+     * @return  int                             < 0 on error, 0 on success, 1 to replace standard code
+     */
+	function printObjectLine($parameters, &$object, &$action, $hookmanager)
+    {
+	    global $conf, $langs, $user;
+
+	    $context = explode(':', $parameters['context']);
+		echo "========yellow means that line is for approver==============<br>";
+		$object->lines[0]->product_type = "approval-item";
+		//$object->approve($user);
+		return 0;
+	}
+    function addMoreActionsButtons($parameters, &$object, &$action, $hookmanager)
+    {
+	    global $conf, $langs, $user;
+
+        require_once DOL_DOCUMENT_ROOT .'/compta/facture/class/facture.class.php';
+	    $context = explode(':', $parameters['context']);
+		if (in_array('ordersuppliercard', $context)) {		
+			if ($object->statut == Facture::STATUS_VALIDATED) {
+				print '<a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=reopen">'.$langs->trans("Ok, Approve").'</a>';
+				print '<a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=reopen">'.$langs->trans("No, Disapprove").'</a>';
+				return 1;
+			}
+		}
+		return 0;	    
+    }
 
 
     /**
@@ -143,7 +177,9 @@ class ActionsMyApprovalFlow
 
         $error = 0; // Error counter
 
-        /* print_r($parameters); print_r($object); echo "action: " . $action; */
+		//echo "========doMassActions==============<br>";
+        //print_r($parameters); print_r($object); echo "action: " . $action;
+		
         if (in_array($parameters['currentcontext'], array('somecontext1','somecontext2')))		// do something only for the context 'somecontext1' or 'somecontext2'
         {
             foreach($parameters['toselect'] as $objectid)
@@ -177,7 +213,8 @@ class ActionsMyApprovalFlow
         global $conf, $user, $langs;
 
         $error = 0; // Error counter
-
+		//echo "===========addMoreMassActions===============<br>";
+		//var_dump($this);
         /* print_r($parameters); print_r($object); echo "action: " . $action; */
         if (in_array($parameters['currentcontext'], array('somecontext1','somecontext2')))		// do something only for the context 'somecontext1' or 'somecontext2'
         {
