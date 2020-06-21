@@ -177,39 +177,51 @@ class ActionsMyApprovalFlow
     {
         global $conf, $user, $langs;
         foreach( $object->lines as $line) {
-            if ($line->product_ref != NULL) // only predefined line will go through work flow
+            if ($this->_isMyApproveTarget($object, $line))
+                return true;            
+        }
+        return false;
+    }
+
+     /**
+     * check whether line is for user
+     */
+    protected function _isMyApproveTarget($object, $line)
+    {
+        global $conf, $user, $langs;
+
+        if ($line->product_ref != NULL) // only predefined line will go through work flow
+        {
+            if ($line->special_code == -1)                    
             {
-                if ($line->special_code == -1)                    
+                $approverObj = $this->_getPOApprover($line);
+                switch ($object->extraparams['step'])
                 {
-                    $approverObj = $this->_getPOApprover($line);
-                    switch ($object->extraparams['step'])
-                    {
-                        case 1:
-                            $appUser = $this->_getUserFromAcct($approverObj->app1);
-                            if ($appUser && $appUser->login == $user->login)
-                                return true;
-                            $appUser = $this->_getUserFromAcct($approverObj->orapp1);
-                            if ($appUser && $appUser->login == $user->login)
-                                return true;
-                            break;
-                        case 2;
-                            $appUser = $this->_getUserFromAcct($approverObj->app2);
-                            if ($appUser && $appUser->login == $user->login)
-                                return true;
-                            break;
-                        case 3:
-                            $appUser = $this->_getUserFromAcct($approverObj->app3);
-                            if ($appUser && $appUser->login == $user->login)
-                                return true;
-                            break;
-                        case 4:                            
-                            $appUser = $this->_getUserFromAcct($approverObj->app4);
-                            if ($appUser && $appUser->login == $user->login)
-                                return true;
-                            break;
-                        default:
-                            break;
-                    }
+                    case 1:
+                        $appUser = $this->_getUserFromAcct($approverObj->app1);
+                        if ($appUser && $appUser->login == $user->login)
+                            return true;
+                        $appUser = $this->_getUserFromAcct($approverObj->orapp1);
+                        if ($appUser && $appUser->login == $user->login)
+                            return true;
+                        break;
+                    case 2;
+                        $appUser = $this->_getUserFromAcct($approverObj->app2);
+                        if ($appUser && $appUser->login == $user->login)
+                            return true;
+                        break;
+                    case 3:
+                        $appUser = $this->_getUserFromAcct($approverObj->app3);
+                        if ($appUser && $appUser->login == $user->login)
+                            return true;
+                        break;
+                    case 4:                            
+                        $appUser = $this->_getUserFromAcct($approverObj->app4);
+                        if ($appUser && $appUser->login == $user->login)
+                            return true;
+                        break;
+                    default:
+                        break;
                 }
             }
         }
@@ -302,8 +314,13 @@ class ActionsMyApprovalFlow
 	    global $conf, $langs, $user;
 
 	    $context = explode(':', $parameters['context']);
-		echo "========yellow means that line is for approver==============<br>";
-		$object->lines[0]->product_type = "approval-item";
+        $line = $parameters['line'];
+        if (in_array('ordersuppliercard', $context)) {            
+            if ($this->_isMyApproveTarget($object, $line))
+            {
+                $line->product_type = "approval-item";
+            }
+        }
 		//$object->approve($user);
 		return 0;
 	}
@@ -320,7 +337,7 @@ class ActionsMyApprovalFlow
 				print '<a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=linereject">'.$langs->trans("No, Disapprove").'</a>';
 				return 1;
             }
-            
+
             if ($object->statut == 0 && count($object->lines))
 			{
 				if ((empty($conf->global->MAIN_USE_ADVANCED_PERMS) && !empty($user->rights->fournisseur->commande->creer))
