@@ -314,11 +314,36 @@ class ActionsMyApprovalFlow
         require_once DOL_DOCUMENT_ROOT .'/compta/facture/class/facture.class.php';
 	    $context = explode(':', $parameters['context']);
 		if (in_array('ordersuppliercard', $context)) {
+            
 			if ($object->statut == Facture::STATUS_VALIDATED && $this->_checkApprovePermission($object)) {
 				print '<a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=lineapprove">'.$langs->trans("Ok, Approve").'</a>';
 				print '<a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=linereject">'.$langs->trans("No, Disapprove").'</a>';
 				return 1;
+            }
+            
+            if ($object->statut == 0 && count($object->lines))
+			{
+				if ((empty($conf->global->MAIN_USE_ADVANCED_PERMS) && !empty($user->rights->fournisseur->commande->creer))
+			   	|| (!empty($conf->global->MAIN_USE_ADVANCED_PERMS) && !empty($user->rights->fournisseur->supplier_order_advance->validate)))
+				{
+					$tmpbuttonlabel = "Yes,".$langs->trans('Validate');
+					
+					print '<a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=valid">';
+					print $tmpbuttonlabel;
+                    print '</a>';
+				}
+            }
+            // Clone
+			if ($user->rights->fournisseur->commande->creer)
+			{
+				print '<a class="butAction" href="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'&amp;socid='.$object->socid.'&amp;action=clone&amp;object=order">'.$langs->trans("ToClone").'</a>';
 			}
+            // Delete
+			if (!empty($user->rights->fournisseur->commande->supprimer) || ($object->statut == CommandeFournisseur::STATUS_DRAFT && !empty($user->rights->fournisseur->commande->creer)))
+			{
+				print '<a class="butActionDelete" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=delete">'.$langs->trans("Delete").'</a>';
+            }
+            return 1;
 		}
 		return 0;
     }
