@@ -339,7 +339,7 @@ class ActionsMyApprovalFlow
 		//print_r($_SERVER);
 		//exit;
         $error = 0; // Error counter
-        /* print_r($parameters); print_r($object); echo "action: " . $action; */
+        //print_r($parameters); print_r($object); echo "action: " . $action;
         $context = explode(':', $parameters['context']);
 		if (in_array('ordersuppliercard', $context)) {
 
@@ -348,6 +348,11 @@ class ActionsMyApprovalFlow
             */
             switch($action)
             {
+                case "confirm_valid":
+                    $object->valid($user);                    
+	           	    header('Location: '.$_SERVER["PHP_SELF"].'?id='.$object->id);
+                    return 1;
+                    break;
                 case "valid":
                     $this->_initWorkflow($object);
                     return 1;
