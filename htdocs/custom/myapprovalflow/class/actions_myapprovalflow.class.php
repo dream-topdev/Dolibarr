@@ -245,7 +245,7 @@ class ActionsMyApprovalFlow
         if ($object->extraparams['line_stat']['current'] == $object->extraparams['line_stat']['total'])
         {
             // if all lines in step are approved, then go to next step, or make validate
-            
+
         }
         $object->setExtraParameters();
         return false;
@@ -298,7 +298,6 @@ class ActionsMyApprovalFlow
                     $this->_disapproveLinesForUser($object);
                     break;
                 default:
-                    echo "action: " . $action . "<br>";
                     break;
             }
 
