@@ -84,6 +84,49 @@ class ActionsMyApprovalFlow
     }
 
     /**
+     * when submit the proposal, init all datas for workflow
+     */
+    protected function _init_workflow(&$object)
+    {
+        global $conf, $user, $langs;
+        $object->extraparams = array(
+            "step" => 1,
+            "line_stat" => array(
+                "total" => 0,   // total lines for current approval step
+                "current" => 0, // approved lines for current approval step
+            )
+        );
+        foreach( $object->lines as $line) {
+            if ($line->product_ref != NULL) // only predefined line will go through work flow
+            {
+                dol_include_once('/myapprovalflow/class/poapprover.class.php');
+                require_once DOL_DOCUMENT_ROOT .'/user/class/user.class.php';
+                $line->special_code = -1; // 1: approve,  -1: disapprove, 0: undefined
+                $pref = preg_replace("/\s+/", "", $line->product_ref);
+                $approvers = new POApprover($this->db);
+                $appuserInfos = $approvers->fetchAll('ASC', 't.rowid', 1, 0, array('t.ref' => $pref));
+                $notifyList = array();
+                foreach( $appuserInfos as $ai) {
+                    $approverName = $ai->app1;
+                    $user = new User($this->db);
+                    $user->fetchAll('ASC','t.rowid',100, 0, array("customsql" => "concat(t.firstname, ' ', t.lastname) like '$approverName'"));
+                    foreach ($user->users as $item) {
+                        if ($notifyList[$item->login] == NULL) {
+                            $notifyList[$item->login] = array(
+                                'email' => $item->email,
+                                'lines' => array()
+                            );
+                        }
+                        $notifyList[$item->]
+                        var_dump($item->email);
+                    }
+
+                }
+            }
+        }
+        $object->updateCommon($user);
+    }
+    /**
      * Overloading the doActions function : replacing the parent's function with the one below
      *
      * @param   array           $parameters     Hook metadatas (context, etc...)
@@ -102,19 +145,15 @@ class ActionsMyApprovalFlow
 		//print_r($_SERVER);
 		//exit;
         $error = 0; // Error counter
-        var_dump($parameters);
-		echo "======================<br>";
-        echo "action: " . $action;
-		echo "======================<br>";
         /* print_r($parameters); print_r($object); echo "action: " . $action; */
         $context = explode(':', $parameters['context']);
 		if (in_array('ordersuppliercard', $context) && $action == "valid") {
-            // Do what you want here...
-            // You can for example call global vars like $fieldstosearchall to overwrite them, or update database depending on $action and $_POST values.
-			foreach( $object->lines as $line){				
-				//var_dump($line->product_ref);
-			}
-			
+
+			/**
+			* before create proposal, first get accounts for each lines, and send notify to step-1 approvers
+			*/
+			$this->_init_workflow($object);
+
 			/**
 			* get user list example
 			*/
@@ -169,14 +208,14 @@ class ActionsMyApprovalFlow
 
         require_once DOL_DOCUMENT_ROOT .'/compta/facture/class/facture.class.php';
 	    $context = explode(':', $parameters['context']);
-		if (in_array('ordersuppliercard', $context)) {		
+		if (in_array('ordersuppliercard', $context)) {
 			if ($object->statut == Facture::STATUS_VALIDATED) {
 				print '<a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=approve">'.$langs->trans("Ok, Approve").'</a>';
 				print '<a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=reopen">'.$langs->trans("No, Disapprove").'</a>';
 				return 0;
 			}
 		}
-		return 0;	    
+		return 0;
     }
 
 
@@ -197,7 +236,7 @@ class ActionsMyApprovalFlow
 
 		//echo "========doMassActions==============<br>";
         //print_r($parameters); print_r($object); echo "action: " . $action;
-		
+
         if (in_array($parameters['currentcontext'], array('somecontext1','somecontext2')))		// do something only for the context 'somecontext1' or 'somecontext2'
         {
             foreach($parameters['toselect'] as $objectid)

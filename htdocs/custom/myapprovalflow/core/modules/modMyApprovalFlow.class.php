@@ -89,7 +89,7 @@ class modMyApprovalFlow extends DolibarrModules
             // Set this to 1 if module has its own barcode directory (core/modules/barcode)
             'barcode' => 0,
             // Set this to 1 if module has its own models directory (core/modules/xxx)
-            'models' => 0,
+            'models' => 1,
             // Set this to 1 if module has its own theme directory (theme)
             'theme' => 0,
             // Set this to relative path of css file if module has its own css file
@@ -222,8 +222,8 @@ class modMyApprovalFlow extends DolibarrModules
             //  0 => array(
             //      'label' => 'MyJob label',
             //      'jobtype' => 'method',
-            //      'class' => '/myapprovalflow/class/myobject.class.php',
-            //      'objectname' => 'MyObject',
+            //      'class' => '/myapprovalflow/class/poapprover.class.php',
+            //      'objectname' => 'POApprover',
             //      'method' => 'doScheduledJob',
             //      'parameters' => '',
             //      'comment' => 'Comment',
@@ -246,17 +246,17 @@ class modMyApprovalFlow extends DolibarrModules
         /* BEGIN MODULEBUILDER PERMISSIONS */
         $this->rights[$r][0] = $this->numero + $r; // Permission id (must not be already used)
         $this->rights[$r][1] = 'Read objects of MyApprovalFlow'; // Permission label
-        $this->rights[$r][4] = 'myobject'; // In php code, permission will be checked by test if ($user->rights->myapprovalflow->level1->level2)
+        $this->rights[$r][4] = 'poapprover'; // In php code, permission will be checked by test if ($user->rights->myapprovalflow->level1->level2)
         $this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->myapprovalflow->level1->level2)
         $r++;
         $this->rights[$r][0] = $this->numero + $r; // Permission id (must not be already used)
         $this->rights[$r][1] = 'Create/Update objects of MyApprovalFlow'; // Permission label
-        $this->rights[$r][4] = 'myobject'; // In php code, permission will be checked by test if ($user->rights->myapprovalflow->level1->level2)
+        $this->rights[$r][4] = 'poapprover'; // In php code, permission will be checked by test if ($user->rights->myapprovalflow->level1->level2)
         $this->rights[$r][5] = 'write'; // In php code, permission will be checked by test if ($user->rights->myapprovalflow->level1->level2)
         $r++;
         $this->rights[$r][0] = $this->numero + $r; // Permission id (must not be already used)
         $this->rights[$r][1] = 'Delete objects of MyApprovalFlow'; // Permission label
-        $this->rights[$r][4] = 'myobject'; // In php code, permission will be checked by test if ($user->rights->myapprovalflow->level1->level2)
+        $this->rights[$r][4] = 'poapprover'; // In php code, permission will be checked by test if ($user->rights->myapprovalflow->level1->level2)
         $this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->rights->myapprovalflow->level1->level2)
         $r++;
         /* END MODULEBUILDER PERMISSIONS */
@@ -276,106 +276,149 @@ class modMyApprovalFlow extends DolibarrModules
             'langs'=>'myapprovalflow@myapprovalflow', // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
             'position'=>1000 + $r,
             'enabled'=>'$conf->myapprovalflow->enabled', // Define condition to show or hide menu entry. Use '$conf->myapprovalflow->enabled' if entry must be visible if module is enabled.
-            'perms'=>'$user->rights->myapprovalflow->myobject->read', // Use 'perms'=>'$user->rights->myapprovalflow->level1->level2' if you want your menu with a permission rules
+            'perms'=>'$user->rights->myapprovalflow->poapprover->read', // Use 'perms'=>'$user->rights->myapprovalflow->level1->level2' if you want your menu with a permission rules
             'target'=>'',
             'user'=>2, // 0=Menu for internal users, 1=external users, 2=both
         );
         /* END MODULEBUILDER TOPMENU */
-        /* BEGIN MODULEBUILDER LEFTMENU MYOBJECT
+        /* BEGIN MODULEBUILDER LEFTMENU POAPPROVER
         $this->menu[$r++]=array(
             'fk_menu'=>'fk_mainmenu=myapprovalflow',      // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
             'type'=>'left',                          // This is a Top menu entry
-            'titre'=>'MyObject',
+            'titre'=>'POApprover',
             'mainmenu'=>'myapprovalflow',
-            'leftmenu'=>'myobject',
+            'leftmenu'=>'poapprover',
             'url'=>'/myapprovalflow/myapprovalflowindex.php',
             'langs'=>'myapprovalflow@myapprovalflow',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
             'position'=>1000+$r,
             'enabled'=>'$conf->myapprovalflow->enabled',  // Define condition to show or hide menu entry. Use '$conf->myapprovalflow->enabled' if entry must be visible if module is enabled.
-            'perms'=>'$user->rights->myapprovalflow->myobject->read',			                // Use 'perms'=>'$user->rights->myapprovalflow->level1->level2' if you want your menu with a permission rules
+            'perms'=>'$user->rights->myapprovalflow->poapprover->read',			                // Use 'perms'=>'$user->rights->myapprovalflow->level1->level2' if you want your menu with a permission rules
             'target'=>'',
             'user'=>2,				                // 0=Menu for internal users, 1=external users, 2=both
         );
         $this->menu[$r++]=array(
-            'fk_menu'=>'fk_mainmenu=myapprovalflow,fk_leftmenu=myobject',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+            'fk_menu'=>'fk_mainmenu=myapprovalflow,fk_leftmenu=poapprover',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
             'type'=>'left',			                // This is a Left menu entry
-            'titre'=>'List MyObject',
+            'titre'=>'List POApprover',
             'mainmenu'=>'myapprovalflow',
-            'leftmenu'=>'myapprovalflow_myobject_list',
-            'url'=>'/myapprovalflow/myobject_list.php',
+            'leftmenu'=>'myapprovalflow_poapprover_list',
+            'url'=>'/myapprovalflow/poapprover_list.php',
             'langs'=>'myapprovalflow@myapprovalflow',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
             'position'=>1000+$r,
             'enabled'=>'$conf->myapprovalflow->enabled',  // Define condition to show or hide menu entry. Use '$conf->myapprovalflow->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-            'perms'=>'$user->rights->myapprovalflow->myobject->read',			                // Use 'perms'=>'$user->rights->myapprovalflow->level1->level2' if you want your menu with a permission rules
+            'perms'=>'$user->rights->myapprovalflow->poapprover->read',			                // Use 'perms'=>'$user->rights->myapprovalflow->level1->level2' if you want your menu with a permission rules
             'target'=>'',
             'user'=>2,				                // 0=Menu for internal users, 1=external users, 2=both
         );
         $this->menu[$r++]=array(
-            'fk_menu'=>'fk_mainmenu=myapprovalflow,fk_leftmenu=myobject',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+            'fk_menu'=>'fk_mainmenu=myapprovalflow,fk_leftmenu=poapprover',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
             'type'=>'left',			                // This is a Left menu entry
-            'titre'=>'New MyObject',
+            'titre'=>'New POApprover',
             'mainmenu'=>'myapprovalflow',
-            'leftmenu'=>'myapprovalflow_myobject_new',
-            'url'=>'/myapprovalflow/myobject_page.php?action=create',
+            'leftmenu'=>'myapprovalflow_poapprover_new',
+            'url'=>'/myapprovalflow/poapprover_page.php?action=create',
             'langs'=>'myapprovalflow@myapprovalflow',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
             'position'=>1000+$r,
             'enabled'=>'$conf->myapprovalflow->enabled',  // Define condition to show or hide menu entry. Use '$conf->myapprovalflow->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-            'perms'=>'$user->rights->myapprovalflow->myobject->write',			                // Use 'perms'=>'$user->rights->myapprovalflow->level1->level2' if you want your menu with a permission rules
+            'perms'=>'$user->rights->myapprovalflow->poapprover->write',			                // Use 'perms'=>'$user->rights->myapprovalflow->level1->level2' if you want your menu with a permission rules
             'target'=>'',
             'user'=>2,				                // 0=Menu for internal users, 1=external users, 2=both
         );
-        END MODULEBUILDER LEFTMENU MYOBJECT */
+        */
+
+        $this->menu[$r++]=array(
+            // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+            'fk_menu'=>'fk_mainmenu=myapprovalflow',
+            // This is a Left menu entry
+            'type'=>'left',
+            'titre'=>'List POApprover',
+            'mainmenu'=>'myapprovalflow',
+            'leftmenu'=>'myapprovalflow_poapprover',
+            'url'=>'/myapprovalflow/poapprover_list.php',
+            // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+            'langs'=>'myapprovalflow@myapprovalflow',
+            'position'=>1100+$r,
+            // Define condition to show or hide menu entry. Use '$conf->myapprovalflow->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+            'enabled'=>'$conf->myapprovalflow->enabled',
+            // Use 'perms'=>'$user->rights->myapprovalflow->level1->level2' if you want your menu with a permission rules
+            'perms'=>'1',
+            'target'=>'',
+            // 0=Menu for internal users, 1=external users, 2=both
+            'user'=>2,
+        );
+        $this->menu[$r++]=array(
+            // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+            'fk_menu'=>'fk_mainmenu=myapprovalflow,fk_leftmenu=myapprovalflow_poapprover',
+            // This is a Left menu entry
+            'type'=>'left',
+            'titre'=>'New POApprover',
+            'mainmenu'=>'myapprovalflow',
+            'leftmenu'=>'myapprovalflow_poapprover',
+            'url'=>'/myapprovalflow/poapprover_card.php?action=create',
+            // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+            'langs'=>'myapprovalflow@myapprovalflow',
+            'position'=>1100+$r,
+            // Define condition to show or hide menu entry. Use '$conf->myapprovalflow->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+            'enabled'=>'$conf->myapprovalflow->enabled',
+            // Use 'perms'=>'$user->rights->myapprovalflow->level1->level2' if you want your menu with a permission rules
+            'perms'=>'1',
+            'target'=>'',
+            // 0=Menu for internal users, 1=external users, 2=both
+            'user'=>2
+        );
+
+		/* END MODULEBUILDER LEFTMENU POAPPROVER */
 
         // Exports profiles provided by this module
         $r = 1;
-        /* BEGIN MODULEBUILDER EXPORT MYOBJECT */
+        /* BEGIN MODULEBUILDER EXPORT POAPPROVER */
         /*
         $langs->load("myapprovalflow@myapprovalflow");
         $this->export_code[$r]=$this->rights_class.'_'.$r;
-        $this->export_label[$r]='MyObjectLines';	// Translation key (used only if key ExportDataset_xxx_z not found)
-        $this->export_icon[$r]='myobject@myapprovalflow';
+        $this->export_label[$r]='POApproverLines';	// Translation key (used only if key ExportDataset_xxx_z not found)
+        $this->export_icon[$r]='poapprover@myapprovalflow';
         // Define $this->export_fields_array, $this->export_TypeFields_array and $this->export_entities_array
-        $keyforclass = 'MyObject'; $keyforclassfile='/mymobule/class/myobject.class.php'; $keyforelement='myobject@myapprovalflow';
+        $keyforclass = 'POApprover'; $keyforclassfile='/mymobule/class/poapprover.class.php'; $keyforelement='poapprover@myapprovalflow';
         include DOL_DOCUMENT_ROOT.'/core/commonfieldsinexport.inc.php';
         //$this->export_fields_array[$r]['t.fieldtoadd']='FieldToAdd'; $this->export_TypeFields_array[$r]['t.fieldtoadd']='Text';
         //unset($this->export_fields_array[$r]['t.fieldtoremove']);
-   		//$keyforclass = 'MyObjectLine'; $keyforclassfile='/myapprovalflow/class/myobject.class.php'; $keyforelement='myobjectline@myapprovalflow'; $keyforalias='tl';
+   		//$keyforclass = 'POApproverLine'; $keyforclassfile='/myapprovalflow/class/poapprover.class.php'; $keyforelement='poapproverline@myapprovalflow'; $keyforalias='tl';
 		//include DOL_DOCUMENT_ROOT.'/core/commonfieldsinexport.inc.php';
-        $keyforselect='myobject'; $keyforaliasextra='extra'; $keyforelement='myobject@myapprovalflow';
+        $keyforselect='poapprover'; $keyforaliasextra='extra'; $keyforelement='poapprover@myapprovalflow';
         include DOL_DOCUMENT_ROOT.'/core/extrafieldsinexport.inc.php';
-        //$keyforselect='myobjectline'; $keyforaliasextra='extraline'; $keyforelement='myobjectline@myapprovalflow';
+        //$keyforselect='poapproverline'; $keyforaliasextra='extraline'; $keyforelement='poapproverline@myapprovalflow';
         //include DOL_DOCUMENT_ROOT.'/core/extrafieldsinexport.inc.php';
-        //$this->export_dependencies_array[$r] = array('myobjectline'=>array('tl.rowid','tl.ref')); // To force to activate one or several fields if we select some fields that need same (like to select a unique key if we ask a field of a child to avoid the DISTINCT to discard them, or for computed field than need several other fields)
+        //$this->export_dependencies_array[$r] = array('poapproverline'=>array('tl.rowid','tl.ref')); // To force to activate one or several fields if we select some fields that need same (like to select a unique key if we ask a field of a child to avoid the DISTINCT to discard them, or for computed field than need several other fields)
         //$this->export_special_array[$r] = array('t.field'=>'...');
         //$this->export_examplevalues_array[$r] = array('t.field'=>'Example');
         //$this->export_help_array[$r] = array('t.field'=>'FieldDescHelp');
         $this->export_sql_start[$r]='SELECT DISTINCT ';
-        $this->export_sql_end[$r]  =' FROM '.MAIN_DB_PREFIX.'myobject as t';
-        //$this->export_sql_end[$r]  =' LEFT JOIN '.MAIN_DB_PREFIX.'myobject_line as tl ON tl.fk_myobject = t.rowid';
+        $this->export_sql_end[$r]  =' FROM '.MAIN_DB_PREFIX.'poapprover as t';
+        //$this->export_sql_end[$r]  =' LEFT JOIN '.MAIN_DB_PREFIX.'poapprover_line as tl ON tl.fk_poapprover = t.rowid';
         $this->export_sql_end[$r] .=' WHERE 1 = 1';
-        $this->export_sql_end[$r] .=' AND t.entity IN ('.getEntity('myobject').')';
+        $this->export_sql_end[$r] .=' AND t.entity IN ('.getEntity('poapprover').')';
         $r++; */
-        /* END MODULEBUILDER EXPORT MYOBJECT */
+        /* END MODULEBUILDER EXPORT POAPPROVER */
 
         // Imports profiles provided by this module
         $r = 1;
-        /* BEGIN MODULEBUILDER IMPORT MYOBJECT */
+        /* BEGIN MODULEBUILDER IMPORT POAPPROVER */
         /*
          $langs->load("myapprovalflow@myapprovalflow");
          $this->export_code[$r]=$this->rights_class.'_'.$r;
-         $this->export_label[$r]='MyObjectLines';	// Translation key (used only if key ExportDataset_xxx_z not found)
-         $this->export_icon[$r]='myobject@myapprovalflow';
-         $keyforclass = 'MyObject'; $keyforclassfile='/mymobule/class/myobject.class.php'; $keyforelement='myobject@myapprovalflow';
+         $this->export_label[$r]='POApproverLines';	// Translation key (used only if key ExportDataset_xxx_z not found)
+         $this->export_icon[$r]='poapprover@myapprovalflow';
+         $keyforclass = 'POApprover'; $keyforclassfile='/mymobule/class/poapprover.class.php'; $keyforelement='poapprover@myapprovalflow';
          include DOL_DOCUMENT_ROOT.'/core/commonfieldsinexport.inc.php';
-         $keyforselect='myobject'; $keyforaliasextra='extra'; $keyforelement='myobject@myapprovalflow';
+         $keyforselect='poapprover'; $keyforaliasextra='extra'; $keyforelement='poapprover@myapprovalflow';
          include DOL_DOCUMENT_ROOT.'/core/extrafieldsinexport.inc.php';
          //$this->export_dependencies_array[$r]=array('mysubobject'=>'ts.rowid', 't.myfield'=>array('t.myfield2','t.myfield3')); // To force to activate one or several fields if we select some fields that need same (like to select a unique key if we ask a field of a child to avoid the DISTINCT to discard them, or for computed field than need several other fields)
          $this->export_sql_start[$r]='SELECT DISTINCT ';
-         $this->export_sql_end[$r]  =' FROM '.MAIN_DB_PREFIX.'myobject as t';
+         $this->export_sql_end[$r]  =' FROM '.MAIN_DB_PREFIX.'poapprover as t';
          $this->export_sql_end[$r] .=' WHERE 1 = 1';
-         $this->export_sql_end[$r] .=' AND t.entity IN ('.getEntity('myobject').')';
+         $this->export_sql_end[$r] .=' AND t.entity IN ('.getEntity('poapprover').')';
          $r++; */
-        /* END MODULEBUILDER IMPORT MYOBJECT */
+        /* END MODULEBUILDER IMPORT POAPPROVER */
     }
 
     /**
@@ -409,9 +452,9 @@ class modMyApprovalFlow extends DolibarrModules
 
         // ODT template
         /*
-        $src=DOL_DOCUMENT_ROOT.'/install/doctemplates/myapprovalflow/template_myobjects.odt';
+        $src=DOL_DOCUMENT_ROOT.'/install/doctemplates/myapprovalflow/template_poapprovers.odt';
         $dirodt=DOL_DATA_ROOT.'/doctemplates/myapprovalflow';
-        $dest=$dirodt.'/template_myobjects.odt';
+        $dest=$dirodt.'/template_poapprovers.odt';
 
         if (file_exists($src) && ! file_exists($dest))
         {
