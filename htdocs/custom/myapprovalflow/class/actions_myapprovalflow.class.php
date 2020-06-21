@@ -234,6 +234,7 @@ class ActionsMyApprovalFlow
     protected function _approveLinesForUser(&$object)
     {
         global $conf, $user, $langs;
+
         foreach( $object->lines as $line) {
             if ($this->_isMyApproveTarget($object, $line))
             {
@@ -245,7 +246,39 @@ class ActionsMyApprovalFlow
         if ($object->extraparams['line_stat']['current'] == $object->extraparams['line_stat']['total'])
         {
             // if all lines in step are approved, then go to next step, or make validate
-
+            $object->extraparams['step'] ++;
+            $object->extraparams['line_stat']['total'] = 0;
+            $object->extraparams['line_stat']['current'] = 0;
+            foreach( $object->lines as $line) {
+                if ($line->product_ref != NULL) // only predefined line will go through work flow
+                {
+                    $line->special_code = -1; // 1: approve, 0: disapprove,  -1: undefined
+                    $approverObj = $this->_getPOApprover($line);
+                    if ($approverObj != NULL) {
+                        switch ($object->extraparams['step'])
+                        {
+                            case 2:
+                                $approverName = $approverObj->app2;
+                                break;
+                            case 3:
+                                $approverName = $approverObj->app3;
+                                break;
+                            case 4:
+                                $approverName = $approverObj->app4;
+                                break;
+                        }
+                        if ($approverName)
+                            $object->extraparams['line_stat']['total'] ++;
+                        else
+                            $line->special_code = 1; // no more approver, so this line is approved
+                    }
+                    $line->update();
+                }
+            }
+            if ($object->extraparams['line_stat']['total'] == 0)  
+            {
+                $this->_approve($object); // finally approved
+            }
         }
         $object->setExtraParameters();
         return false;
@@ -256,7 +289,35 @@ class ActionsMyApprovalFlow
      */
     protected function _disapproveLinesForUser(&$object)
     {
+        global $conf, $user, $langs;
 
+        $this->_refuse($object);
+    }
+
+    /**
+     * approve purchase order 
+     */
+    protected function _approve($object)
+    {
+        $sql = "UPDATE ".MAIN_DB_PREFIX."commande_fournisseur SET fk_statut = 2"; // accepted : 2
+        $sql .= " WHERE rowid = ".$object->id;
+
+        if ($this->db->query($sql))
+            return true;
+        return false;
+    }
+    
+    /**
+     * approve purchase order 
+     */
+    protected function _refuse($object)
+    {
+        $sql = "UPDATE ".MAIN_DB_PREFIX."commande_fournisseur SET fk_statut = 9"; // refused : 9
+        $sql .= " WHERE rowid = ".$object->id;
+
+        if ($this->db->query($sql))
+            return true;
+        return false;
     }
 
     /**
@@ -296,6 +357,7 @@ class ActionsMyApprovalFlow
                     break;
                 case 'linereject':
                     $this->_disapproveLinesForUser($object);
+                    return 1;
                     break;
                 default:
                     break;
