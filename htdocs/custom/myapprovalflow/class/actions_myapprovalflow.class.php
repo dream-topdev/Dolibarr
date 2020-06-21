@@ -84,9 +84,30 @@ class ActionsMyApprovalFlow
     }
 
     /**
+     * add email info to notify list
+     */
+    protected function _addEmailToNotify(&$notify, $apprName)
+    {
+        $user = new User($this->db);
+        $user->fetchAll('ASC','t.rowid',100, 0, array("customsql" => "concat(t.firstname, ' ', t.lastname) like '$apprName'"));
+        if ($user->users == NULL)
+            return -1; // No Approver
+        
+        foreach ($user->users as $item) {
+            if ($notify[$item->login] == NULL) {
+                $notify[$item->login] = array(
+                    'email' => $item->email,
+                    'lines' => array()
+                );
+            }
+            $notify[$item->login]['lines'][] = $line->product_ref;                        
+        }
+        return 1; // Add successful
+    }
+    /**
      * when submit the proposal, init all datas for workflow
      */
-    protected function _init_workflow(&$object)
+    protected function _initWorkflow(&$object)
     {
         global $conf, $user, $langs;
         $object->extraparams = array(
@@ -96,6 +117,7 @@ class ActionsMyApprovalFlow
                 "current" => 0, // approved lines for current approval step
             )
         );
+        $notifyList = array();        
         foreach( $object->lines as $line) {
             if ($line->product_ref != NULL) // only predefined line will go through work flow
             {
@@ -105,25 +127,14 @@ class ActionsMyApprovalFlow
                 $pref = preg_replace("/\s+/", "", $line->product_ref);
                 $approvers = new POApprover($this->db);
                 $appuserInfos = $approvers->fetchAll('ASC', 't.rowid', 1, 0, array('t.ref' => $pref));
-                $notifyList = array();
                 foreach( $appuserInfos as $ai) {
-                    $approverName = $ai->app1;
-                    $user = new User($this->db);
-                    $user->fetchAll('ASC','t.rowid',100, 0, array("customsql" => "concat(t.firstname, ' ', t.lastname) like '$approverName'"));
-                    foreach ($user->users as $item) {
-                        if ($notifyList[$item->login] == NULL) {
-                            $notifyList[$item->login] = array(
-                                'email' => $item->email,
-                                'lines' => array()
-                            );
-                        }
-                        $notifyList[$item->]
-                        var_dump($item->email);
-                    }
-
+                    $this->_addEmailToNotify($notifyList, $ai->app1);
+                    if ($ai->orapp1) // if alternative approver exists?
+                        $this->_addEmailToNotify($notifyList, $ai->orapp1);                    
                 }
             }
         }
+        var_dump($notifyList);
         $object->updateCommon($user);
     }
     /**
@@ -152,7 +163,7 @@ class ActionsMyApprovalFlow
 			/**
 			* before create proposal, first get accounts for each lines, and send notify to step-1 approvers
 			*/
-			$this->_init_workflow($object);
+			$this->_initWorkflow($object);
 
 			/**
 			* get user list example
