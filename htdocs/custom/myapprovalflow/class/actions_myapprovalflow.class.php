@@ -229,6 +229,37 @@ class ActionsMyApprovalFlow
     }
 
     /**
+     * approve user's line
+     */
+    protected function _approveLinesForUser(&$object)
+    {
+        global $conf, $user, $langs;
+        foreach( $object->lines as $line) {
+            if ($this->_isMyApproveTarget($object, $line))
+            {
+                $line->special_code = 1; //approve
+                $object->extraparams['line_stat']['current'] ++;
+                $line->update();
+            }
+        }
+        if ($object->extraparams['line_stat']['current'] == $object->extraparams['line_stat']['total'])
+        {
+            // if all lines in step are approved, then go to next step, or make validate
+            
+        }
+        $object->setExtraParameters();
+        return false;
+    }
+
+    /**
+     * disapprove user's line
+     */
+    protected function _disapproveLinesForUser(&$object)
+    {
+
+    }
+
+    /**
      * Overloading the doActions function : replacing the parent's function with the one below
      *
      * @param   array           $parameters     Hook metadatas (context, etc...)
@@ -261,10 +292,10 @@ class ActionsMyApprovalFlow
                     return 1;
                     break;
                 case 'lineapprove':
-                    echo "action: " . $action . "<br>";
+                    $this->_approveLinesForUser($object);
                     break;
                 case 'linereject':
-                    echo "action: " . $action . "<br>";
+                    $this->_disapproveLinesForUser($object);
                     break;
                 default:
                     echo "action: " . $action . "<br>";
