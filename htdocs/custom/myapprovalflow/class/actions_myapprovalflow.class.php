@@ -321,6 +321,50 @@ class ActionsMyApprovalFlow
     }
 
     /**
+     * generate csv file
+     */
+    protected function _generate_csv($object)
+    {
+        global $conf, $user, $langs;
+        require_once DOL_DOCUMENT_ROOT . '/core/modules/export/export_csv.modules.php';
+        $filename = $conf->myapprovalflow->dir_output . "/PO" . $object->ref . ".csv";
+        $ecsv = new ExportCsv($this->db);
+        $ecsv->open_file($filename, $langs);
+        //output purcharse order requisition number
+        $po = explode('-', $object->ref);
+        $ecsv->write_record(
+            array('A' => 1, 'B' => 1, 'C' => 1, 'D' => 1, 'E' => 1, 'F' => 1, 'G' => 1, 'H' => 1, 'J' => 1, 'K' => 1, 'L' => 1),
+            (object)array( 
+                'A' => 'H',
+                'F' => $po[0],
+                'G' => $po[1],
+                'L' => date("m/d/Y", $object->date)
+            ),
+            $langs,
+            array()
+        );
+        //vendor
+        $socObj = new Societe($this->db);
+        $socObj->fetch($object->socid);
+        $so = explode('-', $socObj->code_fournisseur);
+        $requestor = new User($this->db);
+        $requestor->fetch($object->user_author_id);
+        $ecsv->write_record(
+            array('A' => 1, 'B' => 1, 'C' => 1, 'D' => 1, 'E' => 1, 'F' => 1, 'G' => 1, 'H' => 1, 'J' => 1, 'K' => 1, 'L' => 1),
+            (object)array( 
+                'A' => 'V',
+                'F' => substr($so[0], 2, 6), // only numeric
+                'G' => substr($so[1], 0, 6),
+                'L' => date("m/d/y", $object->date_valid),
+                'L' => $requestor->firstname . ' ' . $requestor->lastname
+            ),
+            $langs,
+            array()
+        );
+        //
+        $ecsv->close_file();
+    }
+    /**
      * Overloading the doActions function : replacing the parent's function with the one below
      *
      * @param   array           $parameters     Hook metadatas (context, etc...)
@@ -341,6 +385,13 @@ class ActionsMyApprovalFlow
         $error = 0; // Error counter
         //print_r($parameters); print_r($object); echo "action: " . $action;
         $context = explode(':', $parameters['context']);
+        //include_once DOL_DOCUMENT_ROOT.'/core/class/CMailFile.class.php';
+        //$mail = new CMailFile('test', 'postmaster@localhost', 'test@localhost', 'hello', array(), array(), array(), '', '', 0, '', '', '', '', '', 'standard');
+
+        //$result = $mail->check_server_port('ssl://smtp.gmail.com', 465);
+        //var_dump($conf->myapprovalflow->dir_output);
+        //$this->_generate_csv($object);
+        //exit;
 		if (in_array('ordersuppliercard', $context)) {
 
 			/**
