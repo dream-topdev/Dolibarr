@@ -464,6 +464,9 @@ class ActionsMyApprovalFlow
 	    $context = explode(':', $parameters['context']);
         $line = $parameters['line'];
         if (in_array('ordersuppliercard', $context)) {            
+            
+            $approverObj = $this->_getPOApprover($line);
+            var_dump($approverObj);
             if ($this->_isMyApproveTarget($object, $line))
             {
                 $line->product_type = "approval-item";
