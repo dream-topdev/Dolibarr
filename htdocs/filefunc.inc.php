@@ -62,8 +62,9 @@ $conffiletoshowshort = "conf.php";
 $conffile = "conf/conf.php";
 $conffiletoshow = "htdocs/conf/conf.php";
 // For debian/redhat like systems
-$conffile = "/etc/dolibarr/conf.php";
-$conffiletoshow = "/etc/dolibarr/conf.php";
+if($_SERVER['SERVER_NAME'] != 'localhost')
+	$conffile = "/etc/dolibarr/conf.php";
+	$conffiletoshow = "/etc/dolibarr/conf.php";
 
 
 // Include configuration
@@ -297,3 +298,4 @@ if (preg_match('/crypted:/i', $dolibarr_main_db_pass) || ! empty($dolibarr_main_
 	}
 	else $dolibarr_main_db_pass = dol_decode($dolibarr_main_db_encrypted_pass);
 }
+

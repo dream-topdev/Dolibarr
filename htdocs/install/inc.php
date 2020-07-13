@@ -3,8 +3,8 @@
  * Copyright (C) 2004       Benoit Mortier          <benoit.mortier@opensides.be>
  * Copyright (C) 2004       Sebastien DiCintio      <sdicintio@ressource-toi.org>
  * Copyright (C) 2007-2012  Laurent Destailleur     <eldy@users.sourceforge.net>
- * Copyright (C) 2012       Marcos García           <marcosgdf@gmail.com>
- * Copyright (C) 2016       Raphaël Doursenaud      <rdoursenaud@gpcsolutions.fr>
+ * Copyright (C) 2012       Marcos GarcÃ­a           <marcosgdf@gmail.com>
+ * Copyright (C) 2016       RaphaÃ«l Doursenaud      <rdoursenaud@gpcsolutions.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -74,8 +74,9 @@ $conffiletoshowshort = "conf.php";
 $conffile = "../conf/conf.php";
 $conffiletoshow = "htdocs/conf/conf.php";
 // For debian/redhat like systems
-$conffile = "/etc/dolibarr/conf.php";
-$conffiletoshow = "/etc/dolibarr/conf.php";
+if($_SERVER['SERVER_NAME'] != 'localhost')
+	$conffile = "/etc/dolibarr/conf.php";
+	$conffiletoshow = "/etc/dolibarr/conf.php";
 
 
 // Load conf file if it is already defined
